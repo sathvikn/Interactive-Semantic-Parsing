@@ -1,5 +1,4 @@
 import os
-import matplotlib.pyplot as plt
 
 #List of processes where we adjust lower level learning rate on the toy dataset
 
