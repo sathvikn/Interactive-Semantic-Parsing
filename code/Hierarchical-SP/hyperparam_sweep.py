@@ -1,4 +1,6 @@
 import os
+import re
+import pickle
 
 #List of processes where we adjust lower level learning rate on the toy dataset
 
@@ -15,3 +17,13 @@ for hlr in learning_rates:
 #Also check what's in model checkpoings/if they themselves log model performance
 
 #Make a plot
+# ckpt_dir = 'Log/hRL/REINFORCE/checkpoint'
+# dirs = os.listdir(ckpt_dir)
+# for d in dirs:
+#     matches = re.search('{(.*)_0', d)
+#     llr = float(matches.group(1))
+#     matches = re.search('0_(.*)}', d)
+#     hlr = float(matches.group(1))
+#     stats_file = os.path.join(ckpt_dir, d, 'stats.pkl')
+#     data = pickle.load(open(stats_file))
+#     print(data)

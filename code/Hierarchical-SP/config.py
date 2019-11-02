@@ -28,7 +28,7 @@ MINIMUM_EPSILON = 1e-8
 
 # default configs
 LEARNING_RATE = 0.001
-ITERS_PER_VALIDATION = 500 # evaluate the training performance per STEPS_PER_VALIDATION
+ITERS_PER_VALIDATION = 250 # evaluate the training performance per STEPS_PER_VALIDATION
 DISCOUNT = 0.99 # Discount factor for future rewards.
 BATCH_SIZE = 32
 TARGET_UPDATE_RATE = 0.000 # Update the target/delayed network by this rate.
