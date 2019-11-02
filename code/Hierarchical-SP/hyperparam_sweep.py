@@ -8,7 +8,7 @@ cmd = "python run.py --train --training_stage=0 --toy_data"
 
 for hlr in learning_rates:
     for llr in learning_rates:
-        cmd_with_lrs = cmd + " --high_level_lr " + hlr + " --low_level_lr " + llr
+        cmd_with_lrs = cmd + " --high_level_lr " + str(hlr) + " --low_level_lr " + str(llr)
         os.system(cmd_with_lrs)
 #Read from a text file with results (overall accuracy for now)
 #TODO: modify the code where they log values in the console to also put these values in a text file?
