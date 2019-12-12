@@ -1,8 +1,8 @@
 import os
 import re
 import pickle
-import numpy as np
-import matplotlib.pyplot as plt
+#import numpy as np
+#import matplotlib.pyplot as plt
 
 #List of processes where we adjust lower level learning rate on the toy dataset
 
@@ -35,13 +35,14 @@ dirs = os.listdir(ckpt_dir)
 for d in dirs:
     result_dev_performance = ckpt_dir + "/" + d + "/dev_iter2performance.pkl"
     data = pickle.load(open(result_dev_performance))
+    print(data)
     ###Read data from pickle file
     #accuracy = []
-    iters = np.arange(len(accuracy)) * 250
-    matches = re.search('{(.*)_0', d)
-    llr = float(matches.group(1))
-    matches = re.search('0_(.*)}', d)
-    hlr = float(matches.group(1))
-    plt.plot(iters, accuracy, label = "llr = " + str(llr) + ", hlr = " + str(hlr))
-plt.legend()
-plt.show()
+    #iters = np.arange(len(accuracy)) * 250
+   # matches = re.search('{(.*)_0', d)
+   # llr = float(matches.group(1))
+   # matches = re.search('0_(.*)}', d)
+   # hlr = float(matches.group(1))
+   # plt.plot(iters, accuracy, label = "llr = " + str(llr) + ", hlr = " + str(hlr))
+#plt.legend()
+#plt.show()
