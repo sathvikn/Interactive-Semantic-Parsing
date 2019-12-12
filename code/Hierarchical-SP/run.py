@@ -90,6 +90,9 @@ if not FLAGS.greedy_test:
     attr += "_sampleTest"
 if not FLAGS.bool_low_agent_attention:
     attr += "_notLowAtt"
+if FLAGS.expt_name:
+    attr += FLAGS.expt_name
+    
 print("FLAGS attribute: %s" % attr)
 
 # path setup
@@ -131,6 +134,7 @@ def create_agent(session, agent_type):
     if agent_type == "baselineAgent":
         # load pretrained baseline agent
         print("Loading pretrained low-level agents from %s." % baseline_agent_path)
+        print(baseline_agent_path)
         ckpt_pretrain = tf.train.get_checkpoint_state(baseline_agent_path)
         assert ckpt_pretrain
         agent.pretrain_saver.restore(session, ckpt_pretrain.model_checkpoint_path)
