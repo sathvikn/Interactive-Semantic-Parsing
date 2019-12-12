@@ -1,7 +1,0 @@
-model_checkpoint_path: "ckpt-1999"
-all_model_checkpoint_paths: "ckpt-0"
-all_model_checkpoint_paths: "ckpt-250"
-all_model_checkpoint_paths: "ckpt-750"
-all_model_checkpoint_paths: "ckpt-1250"
-all_model_checkpoint_paths: "ckpt-1500"
-all_model_checkpoint_paths: "ckpt-1999"

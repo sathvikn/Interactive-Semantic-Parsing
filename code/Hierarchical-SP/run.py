@@ -21,6 +21,7 @@ import pdb
 tf.app.flags.DEFINE_boolean("train", False, "Set to True if running to train.")
 tf.app.flags.DEFINE_boolean("test", False, "Set to True if running to test.")
 tf.app.flags.DEFINE_boolean("toy_data", False, "Set to True for running on toy data (debugging).")
+tf.app.flags.DEFINE_string('expt_name', "", "Name of Experiment")
 
 # agent setting
 tf.app.flags.DEFINE_string("agent_type", "hRL", "Support: hRL, BaselineAgent.")
@@ -316,6 +317,7 @@ def train():
                     for step_idx in reversed(range(len(low_level_buffer))):
                         buffer_data = low_level_buffer[step_idx]
                         reward_reduce = 0.0
+                        #Add RTG/Baseline?
                         accumulate_internal_reward = buffer_data[2] + FLAGS.discount * accumulate_internal_reward
                         for item_idx, item in enumerate(
                                 [buffer_data[0], buffer_data[1],
@@ -349,6 +351,7 @@ def train():
                             accumulate_external_reward = 0
                             for step_idx in reversed(range(len(high_level_buffer))):
                                 buffer_data = high_level_buffer[step_idx]
+                                #Add RTG/baseline here?
                                 accumulate_external_reward = buffer_data[2] + FLAGS.discount * accumulate_external_reward
                                 for item_idx, item in enumerate([buffer_data[0], buffer_data[1],
                                                      accumulate_external_reward - buffer_data[3],

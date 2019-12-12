@@ -1,10 +1,21 @@
 import os
 import re
 import pickle
+<<<<<<< HEAD
 #import numpy as np
 #import matplotlib.pyplot as plt
+=======
+import numpy as np
+# import matplotlib.pyplot as plt
+>>>>>>> d5a42dc751ab20db6090ebd2024fa36f245446de
 
 #List of processes where we adjust lower level learning rate on the toy dataset
+
+def plot_values(data, llr, hlr):
+    keys = sorted(data.keys())
+    with open(str(llr) + "_" + str(hlr) + ".txt", 'w') as f:
+        for k in keys:
+            f.write(str(k) + "\t" + str(data[k][2]) + "\n")
 
 learning_rates = [0.0005, 0.001, 0.002]
 
