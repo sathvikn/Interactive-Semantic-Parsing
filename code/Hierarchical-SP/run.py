@@ -359,7 +359,6 @@ def train():
                     
                         reward_bonus = 0
                         if FLAGS.hl_explore:
-                            print("Exploration")
                             hl_data = list(map(get_state_vectors_from_hl_state, high_level_buffer))
                             hl_kde.fit_data(hl_data)
                             reward_bonus = hl_kde.compute_reward_bonus(hl_vectors)
@@ -369,7 +368,6 @@ def train():
                             for step_idx in reversed(range(len(high_level_buffer))):
                                 buffer_data = high_level_buffer[step_idx]
                                 #Add RTG/baseline here?
-                                print(np.mean(reward_bonus))
                                 accumulate_external_reward = buffer_data[2] + FLAGS.discount * (accumulate_external_reward + np.mean(reward_bonus))
                                 for item_idx, item in enumerate([buffer_data[0], buffer_data[1],
                                                      accumulate_external_reward - buffer_data[3],
