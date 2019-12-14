@@ -71,6 +71,7 @@ tf.app.flags.DEFINE_integer("training_stage", 0,
                             "Set to 2: need load trained params without high-level agent stats."
                             )
 tf.app.flags.DEFINE_boolean("greedy_test", True, "Set to True for greedy test.")
+tf.app.flags.DEFINE_boolean('hl_explore', False, "Set to True to enable exploration for HL Agent")
 
 FLAGS = tf.flags.FLAGS
 print("Training stage: %d" % FLAGS.training_stage)
@@ -109,7 +110,7 @@ print("data path: %s\ncheckpoint path: %s\n" % (data_path, checkpoint_overall_pa
 # pretrained agent
 pretrain_path = os.path.join("Log", FLAGS.agent_type, "pretrain_agent", "hierarchical_agent") # for low-level agents only
 baseline_agent_path = "baseline_agent"
-kde = RBF()
+hl_kde = RBF(reward_bonus=0.1)
 
 
 def create_env(agent, user_answer, chnl_fn_constraints):
@@ -355,16 +356,21 @@ def train():
                         high_level_buffer.append(
                             (hl_state, next_subtask_idx,
                              external_reward, high_v_value))
-                        hl_data = list(map(get_state_vectors_from_hl_state, high_level_buffer))
-                        kde.fit_data(hl_data)
-                        print("Reward Bonus", kde.compute_reward_bonus(hl_vectors))
+                    
+                        reward_bonus = 0
+                        if FLAGS.hl_explore:
+                            print("Exploration")
+                            hl_data = list(map(get_state_vectors_from_hl_state, high_level_buffer))
+                            hl_kde.fit_data(hl_data)
+                            reward_bonus = hl_kde.compute_reward_bonus(hl_vectors)
 
                         if bool_terminal_overall:
                             accumulate_external_reward = 0
                             for step_idx in reversed(range(len(high_level_buffer))):
                                 buffer_data = high_level_buffer[step_idx]
                                 #Add RTG/baseline here?
-                                accumulate_external_reward = buffer_data[2] + FLAGS.discount * accumulate_external_reward
+                                print(np.mean(reward_bonus))
+                                accumulate_external_reward = buffer_data[2] + FLAGS.discount * (accumulate_external_reward + np.mean(reward_bonus))
                                 for item_idx, item in enumerate([buffer_data[0], buffer_data[1],
                                                      accumulate_external_reward - buffer_data[3],
                                                      accumulate_external_reward]):

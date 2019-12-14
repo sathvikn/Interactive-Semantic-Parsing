@@ -126,10 +126,10 @@ def get_state_vectors_from_hl_state(s):
         return np.array([s[0][i] for i in range(len(s[0])) if i % 2 == 0])
 
 class RBF:
-    def __init__(self, sigma = 1, reward_bonus = 0.0001):
+    def __init__(self, sigma = 1, reward_bonus = 0.001):
         self.sigma = sigma
         self.means = None
-        self.reward_bonus = 0.001
+        self.reward_bonus = reward_bonus
 
     def fit_data(self, data):
         #Data is a list of state embeddings
