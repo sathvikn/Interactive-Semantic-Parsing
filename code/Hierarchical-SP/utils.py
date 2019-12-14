@@ -121,5 +121,42 @@ def read_batch_state(states, instruction_length, user_answer_length, agent_level
 
     return reshaped_states
 
+def get_state_vectors_from_hl_state(s):
+    if s:
+        return np.array([s[0][i] for i in range(len(s[0])) if i % 2 == 0])
+
+class RBF:
+    def __init__(self, sigma = 1, reward_bonus = 0.0001):
+        self.sigma = sigma
+        self.means = None
+        self.reward_bonus = 0.001
+
+    def fit_data(self, data):
+        #Data is a list of state embeddings
+        if data:
+            self.means = np.mean(data, axis = 1)
+
+    def get_prob(self, states):
+        if self.means is None:
+        # Return a uniform distribution if we don't have samples in the 
+        # replay buffer yet.
+            return (1.0/len(states))*np.ones(len(states))
+        else:
+            deltas = np.asarray([s - self.means for s in states])
+            euc_dists = np.sum(deltas**2, axis = 1)
+            gaussians = np.exp(-euc_dists / 2 * self.sigma**2)
+            densities = np.mean(gaussians, axis = 1)
+            return densities
+
+    def bonus_fn(self, prob):
+        return self.reward_bonus * -np.log(prob)
+
+    def compute_reward_bonus(self, states):
+        prob = self.get_prob(states)
+        bonus = self.bonus_fn(prob)
+        return bonus
+
+
+
 
 

@@ -1,3 +1,4 @@
+
 """
 @author: Ziyu Yao
 """
@@ -108,6 +109,7 @@ print("data path: %s\ncheckpoint path: %s\n" % (data_path, checkpoint_overall_pa
 # pretrained agent
 pretrain_path = os.path.join("Log", FLAGS.agent_type, "pretrain_agent", "hierarchical_agent") # for low-level agents only
 baseline_agent_path = "baseline_agent"
+kde = RBF()
 
 
 def create_env(agent, user_answer, chnl_fn_constraints):
@@ -347,9 +349,15 @@ def train():
                     instance_high_level_order.append(next_subtask_idx)
                     if FLAGS.training_stage != 1:
                         # store in buffer
+                        hl_state = agent.get_high_level_agent_state(prev_high_level_state)
+                        hl_vectors = np.array([hl_state[i] for i in range(len(hl_state)) if i % 2 == 0])
+                        #Even indices correspond to vectors
                         high_level_buffer.append(
-                            (agent.get_high_level_agent_state(prev_high_level_state), next_subtask_idx,
+                            (hl_state, next_subtask_idx,
                              external_reward, high_v_value))
+                        hl_data = list(map(get_state_vectors_from_hl_state, high_level_buffer))
+                        kde.fit_data(hl_data)
+                        print("Reward Bonus", kde.compute_reward_bonus(hl_vectors))
 
                         if bool_terminal_overall:
                             accumulate_external_reward = 0
@@ -413,7 +421,8 @@ def train():
                 update_batch_by_item_high_level = [[] for _ in range(4)] # clear
 
             # evaluation
-            if iteration % FLAGS.iters_per_validation == 0 or iteration == max_iteration - 1:
+            #if iteration % FLAGS.iters_per_validation == 0 or iteration == max_iteration - 1:
+            if iteration == max_iteration - 1:
                 evaluation_start_time = time.time()
                 print("Evaluation on iteration %d, elapsed time %.3f:" % (
                     iteration, (evaluation_start_time - start_time)))

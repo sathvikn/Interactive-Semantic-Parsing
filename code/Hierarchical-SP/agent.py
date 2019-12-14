@@ -260,7 +260,7 @@ class Agent(object):
             else:
                 actions = [available_actions[idx] for idx in sorted_actions[:num_top]]
         else:
-            print("Available pi values: {}".format(available_pi_values))
+            #print("Available pi values: {}".format(available_pi_values))
             actions_indices = np.random.choice(range(len(available_actions)), size=min(num_top, len(available_actions)),
                                        p=available_pi_values, replace=False)
             if "lam_rule_agent" in self._agent_scope:
