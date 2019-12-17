@@ -22,7 +22,6 @@ import pdb
 tf.app.flags.DEFINE_boolean("train", False, "Set to True if running to train.")
 tf.app.flags.DEFINE_boolean("test", False, "Set to True if running to test.")
 tf.app.flags.DEFINE_boolean("toy_data", False, "Set to True for running on toy data (debugging).")
-tf.app.flags.DEFINE_string('expt_name', "", "Name of Experiment")
 
 # agent setting
 tf.app.flags.DEFINE_string("agent_type", "hRL", "Support: hRL, BaselineAgent.")
@@ -71,8 +70,11 @@ tf.app.flags.DEFINE_integer("training_stage", 0,
                             "Set to 2: need load trained params without high-level agent stats."
                             )
 tf.app.flags.DEFINE_boolean("greedy_test", True, "Set to True for greedy test.")
-tf.app.flags.DEFINE_boolean('hl_explore', False, "Set to True to enable exploration for HL Agent")
 
+#exploration
+tf.app.flags.DEFINE_string('expt_name', "", "Name of Experiment")
+tf.app.flags.DEFINE_boolean('hl_explore', False, "Set to True to enable exploration for HL Agent")
+tf.app.flags.DEFINE_boolean('ll_explore', False, "Set to True to enable exploration for LL Agent")
 FLAGS = tf.flags.FLAGS
 print("Training stage: %d" % FLAGS.training_stage)
 # check args
@@ -111,7 +113,7 @@ print("data path: %s\ncheckpoint path: %s\n" % (data_path, checkpoint_overall_pa
 pretrain_path = os.path.join("Log", FLAGS.agent_type, "pretrain_agent", "hierarchical_agent") # for low-level agents only
 baseline_agent_path = "baseline_agent"
 hl_kde = RBF(reward_bonus=0.1)
-
+ll_kde = RBF(reward_bonus=0.1)
 
 def create_env(agent, user_answer, chnl_fn_constraints):
     env = HierIFTTTEnvironment(
@@ -316,16 +318,25 @@ def train():
 
                 baseline_reduce = 0.0
                 # store the record for local MDP in buffer
-                low_level_buffer.append((agent.get_low_level_agent_state(prev_low_level_state, next_subtask_idx),
-                                         next_actions[0], internal_reward, low_v_value, baseline_reduce))
+                ll_state = agent.get_low_level_agent_state(prev_low_level_state, next_subtask_idx)
+                ll_vectors = get_state_vectors_from_ll_state(ll_state, next_subtask_idx)
+                reward_bonus = 0
 
+                if FLAGS.ll_explore:
+                    hl_data = list(map(get_state_vectors_from_ll_buffer, low_level_buffer))
+                    hl_kde.fit_data(hl_data)
+                    reward_bonus = ll_kde.compute_reward_bonus(ll_vectors)
+
+                low_level_buffer.append((ll_state,
+                                         next_actions[0], internal_reward, low_v_value, baseline_reduce))
+                
                 if bool_subtask_terminal:
                     accumulate_internal_reward = 0.0
                     for step_idx in reversed(range(len(low_level_buffer))):
                         buffer_data = low_level_buffer[step_idx]
                         reward_reduce = 0.0
                         #Add RTG/Baseline?
-                        accumulate_internal_reward = buffer_data[2] + FLAGS.discount * accumulate_internal_reward
+                        accumulate_internal_reward = buffer_data[2] + FLAGS.discount * (accumulate_internal_reward + np.mean(reward_bonus))
                         for item_idx, item in enumerate(
                                 [buffer_data[0], buffer_data[1],
                                 accumulate_internal_reward - reward_reduce,

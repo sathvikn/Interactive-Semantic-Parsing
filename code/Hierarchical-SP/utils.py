@@ -125,6 +125,16 @@ def get_state_vectors_from_hl_state(s):
     if s:
         return np.array([s[0][i] for i in range(len(s[0])) if i % 2 == 0])
 
+def get_state_vectors_from_ll_state(s, state_idx):
+    if s:
+        all_states = s[4:]
+        return all_states[:state_idx]
+
+def get_state_vectors_from_ll_buffer(s):
+    if s:
+        return s[4:]
+         
+
 class RBF:
     def __init__(self, sigma = 1, reward_bonus = 0.001):
         self.sigma = sigma
@@ -152,9 +162,12 @@ class RBF:
         return self.reward_bonus * -np.log(prob)
 
     def compute_reward_bonus(self, states):
-        prob = self.get_prob(states)
-        bonus = self.bonus_fn(prob)
-        return bonus
+        if len(states):
+            prob = self.get_prob(states)
+            bonus = self.bonus_fn(prob)
+            return bonus
+        else:
+            return 0
 
 
 
